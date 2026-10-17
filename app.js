@@ -39,8 +39,8 @@
       p_token: token, p_code: code
     });
     if (rpcError || !data || data.ok !== true) {
-      error.textContent = "الرمز غير صحيح أو سبق استخدامه. تواصل مع صاحب الدعوة.";
-      return;
+    error.textContent = "الرمز غير صحيح أو استُخدم العدد المسموح من المرات.";
+    return;
     }
     // Keep returned guest data only in this page's memory; don't save access codes in browser storage.
     gate.hidden = true;
