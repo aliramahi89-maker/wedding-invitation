@@ -13,10 +13,9 @@
 <body>
   <main class="page">
 
-    <!-- بوابة التحقق من رمز الدعوة -->
+    <!-- التحقق من رمز الدعوة -->
     <section id="gate" class="gate card">
       <p class="eyebrow">دعوة زفاف خاصة</p>
-
       <h1>أهلًا وسهلًا بكم</h1>
 
       <p class="muted">
@@ -41,7 +40,6 @@
         >
 
         <button type="submit">عرض الدعوة</button>
-
         <p id="error" class="error" role="alert" aria-live="polite"></p>
       </form>
     </section>
@@ -49,18 +47,24 @@
     <!-- تفاصيل دعوة الزفاف -->
     <section id="invitation" hidden>
 
-      <!-- صورة سيارة الزفاف والورود -->
-      <section class="photo-card card">
-        <img
-          id="couple-photo"
-          src="assets/couple.jpg"
-          alt="سيارة الزفاف والورود"
+      <!-- فيديو سيارة الزفاف والورود -->
+      <section class="photo-card card video-card">
+        <video
+          id="couple-video"
+          autoplay
+          muted
+          loop
+          playsinline
+          preload="metadata"
+          aria-label="فيديو سيارة الزفاف والورود"
         >
+          <source src="assets/hero.webm" type="video/webm">
+          متصفحك لا يدعم تشغيل الفيديو.
+        </video>
       </section>
 
       <!-- نص الدعوة -->
       <header class="hero card">
-
         <p class="eyebrow">دعوة زفاف</p>
 
         <p class="intro">
@@ -84,16 +88,12 @@
 
         <div class="rule"></div>
 
-        <!-- الموعد -->
         <p id="event-date" class="date">
           الجمعة، 27 نوفمبر 2026
         </p>
 
-        <p class="date">
-          الساعة الثامنة مساءً
-        </p>
+        <p class="date">الساعة الثامنة مساءً</p>
 
-        <!-- مكان الحفل -->
         <p id="venue-name" class="venue">
           نقابة المهندسين الأردنيين – العقبة
         </p>
@@ -121,7 +121,7 @@
           الموقع على الخريطة
         </a>
 
-        <!-- الموسيقى -->
+        <!-- موسيقى الدعوة -->
         <button
           id="music-button"
           class="secondary"
@@ -130,16 +130,11 @@
           ▶ تشغيل الموسيقى
         </button>
 
-        <audio
-          id="music"
-          preload="none"
-          loop
-        ></audio>
-
+        <audio id="music" preload="none" loop></audio>
       </header>
 
       <!-- العبارة الختامية -->
-      <section class="photo-card card">
+      <section class="closing-card card">
         <p class="quote">
           بحضوركم تكتمل فرحتنا، وبمشاركتكم تحلو أيامنا.
         </p>
@@ -166,19 +161,14 @@
         </a>
       </section>
 
-      <!-- التذييل -->
-      <footer>
-        بكل الحب، أحمد وحنين ♡
-      </footer>
-
+      <footer>بكل الحب، أحمد وحنين ♡</footer>
     </section>
 
   </main>
 
-  <!-- المكتبات وملفات التطبيق -->
+  <!-- لا تحذف ملفات Supabase أو التطبيق -->
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script src="config.js"></script>
   <script src="app.js"></script>
-
 </body>
 </html>
