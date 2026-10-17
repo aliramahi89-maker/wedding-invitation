@@ -7,7 +7,7 @@ window.INVITE_CONFIG = {
   venueAddress: "عنوان القاعة",
   mapUrl: "",
   musicUrl: "assets/music.mp3",
-  couplePhotoUrl: "assets/couple.jpg",
+  couplePhotoUrl: "assets/ahmad.png",
   bridegroomName: "أحمد",
   brideName: "حنين",
   rsvpWhatsAppNumber: "" // international digits only, e.g. 9627XXXXXXXX
