@@ -1,56 +1,131 @@
+
 <!doctype html>
 <html lang="ar" dir="rtl">
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="theme-color" content="#f8f3ec">
-  <title>دعوة زفاف</title>
+  <title>دعوة زفاف أحمد وحنين</title>
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
   <main class="page">
+
+    <!-- التحقق من رمز الدعوة -->
     <section id="gate" class="gate card">
       <p class="eyebrow">دعوة خاصة</p>
       <h1>أهلًا وسهلًا بكم</h1>
       <p class="muted">أدخل رمز الدعوة المكوّن من 6 أرقام لعرض التفاصيل.</p>
+
       <form id="code-form">
         <label for="code">رمز الدعوة</label>
-        <input id="code" name="code" inputmode="numeric" autocomplete="one-time-code"
-               pattern="[0-9]{6}" maxlength="6" placeholder="••••••" required>
+        <input
+          id="code"
+          name="code"
+          inputmode="numeric"
+          autocomplete="one-time-code"
+          pattern="[0-9]{6}"
+          maxlength="6"
+          placeholder="••••••"
+          required
+        >
         <button type="submit">عرض الدعوة</button>
         <p id="error" class="error" role="alert"></p>
       </form>
     </section>
 
+    <!-- تفاصيل الدعوة -->
     <section id="invitation" hidden>
       <header class="hero card">
         <div class="flourish" aria-hidden="true">❦</div>
+
         <p class="eyebrow">بسم الله الرحمن الرحيم</p>
-        <p class="intro">بكل الحب والفرح، نتشرّف بدعوتكم لمشاركتنا أجمل أيامنا</p>
-        <h1><span id="bridegroom">أحمد</span> <span class="amp">&</span> <span id="bride">حنين</span></h1>
+
+        <p class="intro">
+          يتشرّف أبناء المرحوم محمد السلطان
+          بدعوتكم لحضور زفاف أخيهم
+        </p>
+
+        <h1>
+          <span id="bridegroom">أحمد</span>
+        </h1>
+
+        <p class="intro">على كريمة السيد عايد الحلو، الآنسة</p>
+
+        <h1>
+          <span id="bride">حنين</span>
+        </h1>
+
         <div class="rule"></div>
-        <p id="event-date" class="date">الجمعة، 27 نوفمبر 2026</p>
-        <p id="venue-name" class="venue">اسم القاعة يُضاف هنا</p>
-        <p id="venue-address" class="muted">عنوان القاعة يُضاف هنا</p>
+
+        <p id="event-date" class="date">
+          الجمعة، 27 نوفمبر 2026
+        </p>
+
+        <p class="date">الساعة الثامنة مساءً</p>
+
+        <p id="venue-name" class="venue">
+          نقابة المهندسين الأردنيين – العقبة
+        </p>
+
+        <p id="venue-address" class="muted">
+          مقابل السفارة المصرية
+        </p>
+
         <div id="countdown" class="countdown" aria-live="polite"></div>
-        <a id="map-link" class="map-link" href="#" target="_blank" rel="noopener" hidden>الموقع على الخريطة</a>
-        <button id="music-button" class="secondary" type="button">▶ تشغيل الموسيقى</button>
+
+        <a
+          id="map-link"
+          class="map-link"
+          href="#"
+          target="_blank"
+          rel="noopener"
+          hidden
+        >الموقع على الخريطة</a>
+
+        <button id="music-button" class="secondary" type="button">
+          ▶ تشغيل الموسيقى
+        </button>
+
         <audio id="music" preload="none" loop></audio>
       </header>
 
       <section class="photo-card card">
-        <img id="couple-photo" src="assets/couple.jpg" alt="صورة العروسين" onerror="this.style.display='none'">
-        <p class="quote">وجودكم يكمّل فرحتنا، وبحضوركم تزداد سعادتنا.</p>
+        <img
+          id="couple-photo"
+          src="assets/couple.jpg"
+          alt="صورة العروسين"
+          onerror="this.style.display='none'"
+        >
+
+        <p class="quote">
+          بحضوركم تكتمل فرحتنا، وبمشاركتكم تحلو أيامنا.
+        </p>
       </section>
 
       <section class="rsvp card">
         <h2>تأكيد الحضور</h2>
-        <p class="muted">يرجى تأكيد الحضور من خلال التواصل مع أصحاب الدعوة.</p>
-        <a id="rsvp-link" class="button-link" href="#" hidden>تأكيد الحضور عبر واتساب</a>
+
+        <p class="muted">
+          نتشرّف بمشاركتكم فرحتنا.
+          لتأكيد الحضور، يمكنكم التواصل مع أصحاب الدعوة.
+        </p>
+
+        <a
+          id="rsvp-link"
+          class="button-link"
+          href="#"
+          hidden
+        >تأكيد الحضور عبر واتساب</a>
       </section>
-      <footer>نتشرّف بوجودكم ومشاركتكم فرحتنا ♡</footer>
+
+      <footer>
+        بكل الحب، أحمد وحنين ♡
+      </footer>
     </section>
+
   </main>
+
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script src="config.js"></script>
   <script src="app.js"></script>
