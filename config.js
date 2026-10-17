@@ -1,7 +1,7 @@
 // Fill these values from your Supabase project. Do not put a service_role key here.
 window.INVITE_CONFIG = {
-  supabaseUrl: "PASTE_SUPABASE_PROJECT_URL",
-  supabaseAnonKey: "PASTE_SUPABASE_ANON_KEY",
+  supabaseUrl: "https://xkjmygkkbrjzqfgkajgc.supabase.co",
+  supabaseAnonKey: "sb_publishable_DzZKK4laLnuakAnye-fPRw_Vdqd2_dp",
   weddingDateISO: "2026-11-27T18:00:00+03:00",
   venueName: "اسم القاعة",
   venueAddress: "عنوان القاعة",
