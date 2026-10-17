@@ -1,0 +1,37 @@
+@import url('https://fonts.googleapis.com/css2?family=Amiri:wght@400;700&family=Cairo:wght@400;600;700&display=swap');
+:root{--ink:#4e443b;--muted:#8a7b6e;--gold:#a98755;--paper:#fffdf9;--line:#e8dccb}
+*{box-sizing:border-box}
+body{margin:0;background:radial-gradient(ellipse at top,#fffdf9 0,#f3e9dc 70%);color:var(--ink);font-family:'Cairo',sans-serif}
+.page{width:min(760px,100%);margin:auto;padding:22px 14px 42px}
+.card{background:rgba(255,253,249,.94);border:1px solid var(--line);border-radius:24px;box-shadow:0 14px 40px #5b46320d;margin:0 auto 18px;overflow:hidden}
+.gate{max-width:460px;padding:32px 24px;margin-top:9vh;text-align:center}
+h1,h2,.intro,.quote{font-family:'Amiri',serif}
+h1{font-size:clamp(2.3rem,8vw,4.4rem);font-weight:400;line-height:1.35;margin:10px 0}
+h2{font-size:2rem;font-weight:400;margin:0 0 8px}
+.eyebrow{color:var(--gold);letter-spacing:.12em;font-size:.85rem}
+.muted{color:var(--muted);line-height:1.9}
+label{display:block;text-align:right;margin:18px 0 7px}
+input{width:100%;padding:14px;border:1px solid var(--line);border-radius:12px;background:white;font-size:1.3rem;text-align:center;letter-spacing:.35em}
+button,.button-link{border:0;border-radius:12px;background:var(--gold);color:white;padding:13px 20px;font:inherit;cursor:pointer;text-decoration:none;display:inline-block;margin-top:14px}
+form button{width:100%}
+.error{color:#b42318;min-height:1.3em}
+.hero{text-align:center;padding:35px 22px 30px;position:relative}
+.flourish{font-size:2.5rem;color:var(--gold)}
+.intro{font-size:1.35rem;line-height:1.9;max-width:540px;margin:10px auto}
+.amp{color:var(--gold);font-size:.65em;padding:0 .1em}
+.rule{height:1px;background:linear-gradient(90deg,transparent,var(--gold),transparent);max-width:260px;margin:18px auto}
+.date{font-weight:700;font-size:1.15rem}
+.venue{font-size:1.2rem;margin-bottom:0}
+.countdown{display:flex;justify-content:center;gap:9px;flex-wrap:wrap;margin:20px auto}
+.time-unit{min-width:72px;border:1px solid var(--line);border-radius:12px;padding:9px 8px;background:#fffaf2}
+.time-unit strong{display:block;font-size:1.25rem;color:var(--gold)}
+.time-unit span{font-size:.75rem;color:var(--muted)}
+.map-link{display:block;color:var(--gold);margin:8px}
+.secondary{background:#efe4d5;color:var(--ink)}
+.photo-card{text-align:center;padding:16px}
+.photo-card img{width:100%;max-height:520px;object-fit:cover;border-radius:16px}
+.quote{font-size:1.45rem;line-height:1.8;margin:16px 8px 8px}
+.rsvp{text-align:center;padding:25px 20px}
+footer{text-align:center;color:var(--muted);padding:16px}
+[hidden]{display:none!important}
+@media(min-width:600px){.page{padding-top:38px}.hero{padding:48px 38px}}
