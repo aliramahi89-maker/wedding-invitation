@@ -1,4 +1,4 @@
-```html
+
 <!DOCTYPE html>
 <html lang="ar" dir="rtl">
 <head>
@@ -34,11 +34,16 @@
     h1 { color: #aa8954; font-size: 26px; }
     p { line-height: 1.8; }
 
-    #reader {
+    input {
+      display: block;
       width: 100%;
-      margin: 20px auto;
-      overflow: hidden;
-      border-radius: 12px;
+      padding: 14px;
+      margin: 12px 0;
+      border: 1px solid #dfcfb0;
+      border-radius: 10px;
+      font-size: 16px;
+      direction: ltr;
+      text-align: left;
     }
 
     button {
@@ -53,9 +58,13 @@
       cursor: pointer;
     }
 
-    button:disabled {
-      opacity: 0.55;
-      cursor: not-allowed;
+    button:disabled { opacity: 0.55; cursor: not-allowed; }
+
+    #reader {
+      width: 100%;
+      margin: 20px auto;
+      overflow: hidden;
+      border-radius: 12px;
     }
 
     #result {
@@ -63,30 +72,16 @@
       margin-top: 18px;
       padding: 16px;
       border-radius: 10px;
-      font-size: 18px;
+      font-size: 17px;
       font-weight: bold;
       overflow-wrap: anywhere;
     }
 
-    .info {
-      background: #f4ead7;
-      color: #6c532b;
-    }
-
-    .success {
-      background: #e0f4e5;
-      color: #176534;
-    }
-
-    .error {
-      background: #fbe4e4;
-      color: #a51d1d;
-    }
-
-    .note {
-      font-size: 13px;
-      color: #75685c;
-    }
+    .info { background: #f4ead7; color: #6c532b; }
+    .success { background: #e0f4e5; color: #176534; }
+    .error { background: #fbe4e4; color: #a51d1d; }
+    .note { font-size: 13px; color: #75685c; }
+    [hidden] { display: none !important; }
   </style>
 </head>
 
@@ -95,85 +90,244 @@
     <h1>التحقق من الدعوات</h1>
     <p>أحمد وحنين — 27 نوفمبر 2026</p>
 
-    <div id="reader"></div>
+    <section id="login-section">
+      <p>تسجيل دخول موظف الاستقبال</p>
+      <form id="login-form">
+        <input
+          id="email"
+          type="email"
+          placeholder="البريد الإلكتروني للموظف"
+          autocomplete="username"
+          required
+        >
+        <input
+          id="password"
+          type="password"
+          placeholder="كلمة المرور"
+          autocomplete="current-password"
+          required
+        >
+        <button id="login-button" type="submit">تسجيل الدخول</button>
+      </form>
+    </section>
 
-    <button id="start-button" type="button">
-      تشغيل الكاميرا ومسح QR
-    </button>
-
-    <button id="stop-button" type="button" disabled>
-      إيقاف الكاميرا
-    </button>
+    <section id="scanner-section" hidden>
+      <p id="staff-status">تم تسجيل الدخول</p>
+      <button id="start-button" type="button">تشغيل الكاميرا ومسح QR</button>
+      <button id="stop-button" type="button" disabled>إيقاف الكاميرا</button>
+      <button id="logout-button" type="button">تسجيل الخروج</button>
+      <div id="reader"></div>
+    </section>
 
     <div id="result" role="status" aria-live="polite"></div>
 
     <p class="note">
-      يجب أن تكون صفحة المسح متاحة عبر HTTPS للسماح باستخدام الكاميرا.
+      يجب فتح الصفحة عبر HTTPS والسماح باستخدام الكاميرا.
     </p>
   </main>
 
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script src="https://unpkg.com/html5-qrcode@2.3.8/html5-qrcode.min.js"></script>
+  <script src="./config.js"></script>
 
   <script>
     (() => {
-      const readerElement = document.getElementById("reader");
+      const cfg = window.INVITE_CONFIG || {};
+      const loginSection = document.getElementById("login-section");
+      const scannerSection = document.getElementById("scanner-section");
+      const loginForm = document.getElementById("login-form");
+      const loginButton = document.getElementById("login-button");
       const startButton = document.getElementById("start-button");
       const stopButton = document.getElementById("stop-button");
+      const logoutButton = document.getElementById("logout-button");
       const result = document.getElementById("result");
+      const staffStatus = document.getElementById("staff-status");
 
       let scanner = null;
       let starting = false;
       let processing = false;
+      let lastScan = "";
+      let lastScanTime = 0;
 
-      function showResult(message, type) {
+      function showResult(message, type = "info") {
         result.textContent = message;
         result.className = type;
         result.style.display = "block";
       }
 
-      async function stopScanner() {
-        if (!scanner || !scanner.isScanning) {
-          stopButton.disabled = true;
-          return;
-        }
+      if (
+        !window.supabase ||
+        !cfg.supabaseUrl ||
+        !cfg.supabaseAnonKey ||
+        cfg.supabaseAnonKey.startsWith("PASTE_")
+      ) {
+        loginButton.disabled = true;
+        showResult(
+          "إعدادات Supabase غير مكتملة. تأكد من config.js والمفتاح العام.",
+          "error"
+        );
+        return;
+      }
 
-        try {
-          await scanner.stop();
-        } catch (error) {
-          console.error("Scanner stop error:", error);
+      const supabase = window.supabase.createClient(
+        cfg.supabaseUrl,
+        cfg.supabaseAnonKey
+      );
+
+      async function stopScanner() {
+        if (scanner && scanner.isScanning) {
+          try {
+            await scanner.stop();
+          } catch (error) {
+            console.error("Scanner stop error:", error);
+          }
         }
 
         stopButton.disabled = true;
         startButton.disabled = false;
       }
 
-      async function handleScan(decodedText) {
-        if (processing) return;
-        processing = true;
-
-        await stopScanner();
-
-        // لا نعتبر الدعوة مقبولة بمجرد قراءة QR.
-        // يجب التحقق من الرمز على الخادم قبل السماح بالدخول.
-        showResult(
-          "تمت قراءة QR، لكن التحقق من صلاحية الدعوة غير مفعّل بعد. لا تسمح بالدخول بناءً على هذه الرسالة.",
-          "info"
-        );
-
-        console.log("QR scanned. Server verification is not configured.");
-        processing = false;
+      function showLogin() {
+        loginSection.hidden = false;
+        scannerSection.hidden = true;
+        staffStatus.textContent = "";
       }
 
-      startButton.addEventListener("click", async () => {
-        if (starting) return;
+      function showScanner(user) {
+        loginSection.hidden = true;
+        scannerSection.hidden = false;
+        staffStatus.textContent = "تم تسجيل الدخول: " + user.email;
+      }
 
+      async function getTokenFromQr(decodedText) {
+        const value = decodedText.trim();
+
+        try {
+          const url = new URL(value);
+          const token = url.searchParams.get("t");
+          if (token) return token;
+        } catch (_) {
+          // قد يحتوي QR على الرمز نفسه بدل رابط.
+        }
+
+        return value;
+      }
+
+      async function handleScan(decodedText) {
+        if (processing) return;
+
+        const now = Date.now();
+        if (decodedText === lastScan && now - lastScanTime < 3000) return;
+
+        lastScan = decodedText;
+        lastScanTime = now;
+        processing = true;
+        startButton.disabled = true;
+
+        await stopScanner();
+        showResult("جارٍ التحقق من الدعوة على الخادم...", "info");
+
+        try {
+          const token = await getTokenFromQr(decodedText);
+
+          if (!token || token.length < 32 || token.length > 512) {
+            showResult("رمز QR غير صالح.", "error");
+            return;
+          }
+
+          const { data, error } = await supabase.functions.invoke(
+            "redeem-invitation",
+            { body: { token } }
+          );
+
+          if (error) {
+            console.error("Invitation check error:", error);
+            const status = error.context?.status;
+
+            if (status === 401) {
+              await supabase.auth.signOut();
+              showLogin();
+              showResult("انتهت جلسة الموظف. سجّل الدخول مرة أخرى.", "error");
+            } else if (status === 403) {
+              showResult("هذا الحساب غير مخوّل لمسح الدعوات.", "error");
+            } else if (status === 409) {
+              showResult("الدعوة غير صالحة أو سبق استخدامها.", "error");
+            } else {
+              showResult(
+                "تعذّر التحقق من الدعوة. لا تسمح بالدخول؛ افحص إعدادات الخادم.",
+                "error"
+              );
+            }
+            return;
+          }
+
+          if (data && data.ok === true) {
+            const label = data.guest_label
+              ? " — " + data.guest_label
+              : "";
+            showResult("تم قبول الدخول" + label, "success");
+          } else {
+            showResult(
+              data?.message || "الدعوة غير صالحة أو سبق استخدامها.",
+              "error"
+            );
+          }
+        } catch (error) {
+          console.error(error);
+          showResult(
+            "تعذّر الاتصال بالخادم. لا تسمح بالدخول قبل نجاح التحقق.",
+            "error"
+          );
+        } finally {
+          processing = false;
+        }
+      }
+
+      loginForm.addEventListener("submit", async (event) => {
+        event.preventDefault();
+        loginButton.disabled = true;
+        showResult("جارٍ تسجيل الدخول...", "info");
+
+        try {
+          const email = document.getElementById("email").value.trim();
+          const password = document.getElementById("password").value;
+
+          const { data, error } = await supabase.auth.signInWithPassword({
+            email,
+            password
+          });
+
+          if (error) {
+            showResult("فشل تسجيل الدخول. تأكد من البريد وكلمة المرور.", "error");
+            return;
+          }
+
+          showScanner(data.user);
+          showResult("تم تسجيل الدخول. يمكنك الآن مسح الدعوات.", "success");
+        } catch (error) {
+          console.error(error);
+          showResult("حدث خطأ أثناء تسجيل الدخول.", "error");
+        } finally {
+          loginButton.disabled = false;
+        }
+      });
+
+      startButton.addEventListener("click", async () => {
+        if (starting || processing) return;
         starting = true;
         startButton.disabled = true;
         showResult("جارٍ تشغيل الكاميرا...", "info");
 
         try {
+          const { data } = await supabase.auth.getSession();
+          if (!data.session) {
+            showLogin();
+            showResult("يرجى تسجيل دخول الموظف أولًا.", "error");
+            return;
+          }
+
           if (!window.Html5Qrcode) {
-            throw new Error("تعذّر تحميل مكتبة مسح QR.");
+            throw new Error("QR library unavailable");
           }
 
           scanner = new Html5Qrcode("reader");
@@ -190,7 +344,7 @@
         } catch (error) {
           console.error(error);
           showResult(
-            "تعذّر تشغيل الكاميرا. تأكد من السماح باستخدامها وفتح الصفحة عبر HTTPS.",
+            "تعذّر تشغيل الكاميرا. تأكد من HTTPS وصلاحية الكاميرا.",
             "error"
           );
           startButton.disabled = false;
@@ -200,8 +354,33 @@
       });
 
       stopButton.addEventListener("click", stopScanner);
+
+      logoutButton.addEventListener("click", async () => {
+        await stopScanner();
+        const { error } = await supabase.auth.signOut();
+
+        if (error) {
+          showResult("تعذّر تسجيل الخروج. حاول مرة أخرى.", "error");
+          return;
+        }
+
+        showLogin();
+        showResult("تم تسجيل الخروج.", "info");
+      });
+
+      supabase.auth.getSession().then(({ data, error }) => {
+        if (error) {
+          showLogin();
+          return;
+        }
+
+        if (data.session?.user) {
+          showScanner(data.session.user);
+        } else {
+          showLogin();
+        }
+      });
     })();
   </script>
 </body>
 </html>
-```
