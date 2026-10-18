@@ -1,181 +1,316 @@
-
-<!doctype html>
+<!DOCTYPE html>
 <html lang="ar" dir="rtl">
 <head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <meta name="theme-color" content="#f8eee7">
-  <meta name="description" content="دعوة خاصة لحفل زفاف أحمد وحنين">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="theme-color" content="#f8f2e8">
+
   <title>دعوة زفاف أحمد وحنين</title>
-  <link rel="stylesheet" href="style.css">
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link
+    href="https://fonts.googleapis.com/css2?family=Amiri:wght@400;700&family=Cairo:wght@400;500;600;700&display=swap"
+    rel="stylesheet"
+  >
+
+  <style>
+    :root {
+      --ivory: #f8f2e8;
+      --gold: #aa8954;
+      --dark: #382f28;
+      --muted: #75685c;
+      --white: #fffdf9;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      background: var(--ivory);
+      color: var(--dark);
+      font-family: "Cairo", sans-serif;
+      text-align: center;
+    }
+
+    [hidden] {
+      display: none !important;
+    }
+
+    .page {
+      width: min(100% - 28px, 760px);
+      margin: 24px auto;
+    }
+
+    .card {
+      padding: 28px 20px;
+      background: var(--white);
+      border: 1px solid #dfcfb0;
+      border-radius: 18px;
+      box-shadow: 0 8px 30px #5c482015;
+    }
+
+    .bismillah {
+      font-family: "Amiri", serif;
+      font-size: 25px;
+      color: var(--gold);
+      margin-bottom: 16px;
+    }
+
+    .ornament {
+      color: var(--gold);
+      font-size: 24px;
+      margin: 12px 0;
+    }
+
+    h1, h2, .arabic {
+      font-family: "Amiri", serif;
+    }
+
+    h1 {
+      font-size: clamp(35px, 8vw, 54px);
+      margin: 10px 0;
+      color: var(--gold);
+    }
+
+    h2 {
+      font-size: 28px;
+      margin: 14px 0;
+    }
+
+    p {
+      line-height: 2;
+      margin: 8px 0;
+    }
+
+    .names {
+      font-size: clamp(30px, 7vw, 44px);
+      color: var(--gold);
+      font-family: "Amiri", serif;
+    }
+
+    .video-wrapper {
+      overflow: hidden;
+      border-radius: 14px;
+      margin: 20px 0;
+      background: #e9dfd0;
+    }
+
+    #couple-video {
+      display: block;
+      width: 100%;
+      max-height: 460px;
+      object-fit: cover;
+    }
+
+    .details {
+      margin: 22px 0;
+      padding: 18px 12px;
+      border-top: 1px solid #dfcfb0;
+      border-bottom: 1px solid #dfcfb0;
+    }
+
+    .detail {
+      margin: 12px 0;
+    }
+
+    .detail-label {
+      color: var(--gold);
+      font-weight: 700;
+    }
+
+    #countdown {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 10px;
+      margin: 22px 0;
+    }
+
+    .countdown-item {
+      min-width: 76px;
+      padding: 12px 8px;
+      border: 1px solid #dfcfb0;
+      border-radius: 12px;
+      background: var(--ivory);
+    }
+
+    .countdown-number {
+      display: block;
+      font-size: 25px;
+      font-weight: 700;
+      color: var(--gold);
+    }
+
+    .countdown-label {
+      font-size: 12px;
+      color: var(--muted);
+    }
+
+    .actions {
+      display: flex;
+      justify-content: center;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin: 20px 0;
+    }
+
+    .button {
+      display: inline-block;
+      padding: 11px 20px;
+      border: 1px solid var(--gold);
+      border-radius: 30px;
+      background: var(--gold);
+      color: white;
+      font-family: inherit;
+      text-decoration: none;
+      cursor: pointer;
+    }
+
+    .button.secondary {
+      background: transparent;
+      color: var(--gold);
+    }
+
+    .error {
+      color: #a52b2b;
+      margin-top: 16px;
+    }
+
+    footer {
+      padding: 22px 8px;
+      color: var(--muted);
+      font-family: "Amiri", serif;
+      font-size: 20px;
+    }
+
+    @media (max-width: 480px) {
+      .page {
+        width: min(100% - 18px, 760px);
+        margin: 10px auto;
+      }
+
+      .card {
+        padding: 22px 14px;
+      }
+    }
+  </style>
 </head>
 
 <body>
   <main class="page">
+    <section id="gate" class="card" hidden>
+      <div class="bismillah">بسم الله الرحمن الرحيم</div>
+      <h2>دعوة زفاف أحمد وحنين</h2>
+      <p id="access-message">
+        يرجى فتح رابط الدعوة الخاص الذي وصلك.
+      </p>
+    </section>
 
-    <!-- التحقق من رمز الدعوة -->
-    <section id="gate" class="gate card">
-      <p class="eyebrow">دعوة زفاف خاصة</p>
-      <h1>أهلًا وسهلًا بكم</h1>
+    <section id="invitation" class="card" hidden>
+      <div class="bismillah">بسم الله الرحمن الرحيم</div>
 
-      <p class="muted">
-        يسعدنا دعوتكم لمشاركتنا فرحتنا.
-        أدخل رمز الدعوة المكوّن من 6 أرقام لعرض التفاصيل.
+      <div class="ornament">✦ ❖ ✦</div>
+
+      <p id="deceased-father" class="arabic">
+        يتشرّف أبناء المرحوم الحاج محمد السلطان
       </p>
 
-      <form id="code-form">
-        <label for="code">رمز الدعوة</label>
+      <p id="invitation-opening" class="arabic">
+        بدعوتكم لحضور حفل زفاف
+      </p>
 
-        <input
-          id="code"
-          name="code"
-          type="text"
-          inputmode="numeric"
-          autocomplete="one-time-code"
-          pattern="[0-9]{6}"
-          maxlength="6"
-          placeholder="••••••"
-          aria-describedby="error"
-          required
-        >
+      <p id="invitation-relation" class="arabic">
+        أخيهم
+      </p>
 
-        <button type="submit">عرض الدعوة</button>
-        <p id="error" class="error" role="alert" aria-live="polite"></p>
-      </form>
-    </section>
+      <h1 id="bridegroom">أحمد</h1>
 
-    <!-- تفاصيل دعوة الزفاف -->
-    <section id="invitation" hidden>
+      <p class="arabic">على كريمة</p>
 
-      <!-- فيديو سيارة الزفاف والورود -->
-      <section class="photo-card card video-card">
+      <p id="bride-father" class="arabic">السيد عايد الحلو</p>
+
+      <h1 id="bride">حنين</h1>
+
+      <div class="ornament">❖</div>
+
+      <div class="video-wrapper">
         <video
           id="couple-video"
-          autoplay
-          muted
-          loop
+          controls
           playsinline
           preload="metadata"
-          aria-label="فيديو سيارة الزفاف والورود"
+          poster="assets/couple.jpg"
         >
           <source src="assets/hero.webm" type="video/webm">
-          متصفحك لا يدعم تشغيل الفيديو.
+          المتصفح لا يدعم تشغيل الفيديو.
         </video>
-      </section>
+      </div>
 
-      <!-- نص الدعوة -->
-      <header class="hero card">
-        <p class="eyebrow">دعوة زفاف</p>
+      <div class="details">
+        <div class="detail">
+          <div class="detail-label">موعد الحفل</div>
+          <p id="event-date">الجمعة، 27 نوفمبر 2026 — الساعة 7 مساءً</p>
+        </div>
 
-        <p id="deceased-father" class="intro">
-          يتشرّف أبناء المرحوم الحاج محمد السلطان
-        </p>
+        <div class="detail">
+          <div class="detail-label">المكان</div>
+          <p id="venue-name">نقابة المهندسين الأردنيين</p>
+          <p id="venue-address">العقبة</p>
+        </div>
+      </div>
 
-        <p id="invitation-opening" class="intro">
-          بدعوتكم لحضور حفل زفاف
-        </p>
+      <h2>الوقت المتبقي لفرحتنا</h2>
+      <div id="countdown" aria-live="polite">
+        <div class="countdown-item">
+          <span id="days" class="countdown-number">0</span>
+          <span class="countdown-label">يوم</span>
+        </div>
+        <div class="countdown-item">
+          <span id="hours" class="countdown-number">0</span>
+          <span class="countdown-label">ساعة</span>
+        </div>
+        <div class="countdown-item">
+          <span id="minutes" class="countdown-number">0</span>
+          <span class="countdown-label">دقيقة</span>
+        </div>
+        <div class="countdown-item">
+          <span id="seconds" class="countdown-number">0</span>
+          <span class="countdown-label">ثانية</span>
+        </div>
+      </div>
 
-        <p id="invitation-relation" class="intro">
-          أخيهم
-        </p>
-
-        <h1>
-          <span id="bridegroom">أحمد</span>
-        </h1>
-
-        <div class="rule"></div>
-
-        <p class="intro">على كريمة</p>
-
-        <p id="bride-father" class="intro">
-          السيد عايد الحلو
-        </p>
-
-        <h1>
-          الآنسة <span id="bride">حنين</span>
-        </h1>
-
-        <div class="rule"></div>
-
-        <p id="event-date" class="date">
-          الجمعة، 27 نوفمبر 2026
-        </p>
-
-        <p class="date">الساعة السابعة مساءً</p>
-
-        <p id="venue-name" class="venue">
-          نقابة المهندسين الأردنيين
-        </p>
-
-        <p id="venue-address" class="muted">
-          العقبة
-        </p>
-
-        <!-- العد التنازلي -->
-        <div
-          id="countdown"
-          class="countdown"
-          aria-live="off"
-        ></div>
-
-        <!-- الموقع على الخريطة -->
-        <a
-          id="map-link"
-          class="map-link"
-          href="#"
-          target="_blank"
-          rel="noopener noreferrer"
-          hidden
-        >
-          الموقع على الخريطة
+      <div class="actions">
+        <a id="map-link" class="button" href="#" target="_blank"
+           rel="noopener noreferrer" hidden>
+          موقع الحفل
         </a>
 
-        <!-- موسيقى الدعوة -->
-        <button
-          id="music-button"
-          class="secondary"
-          type="button"
-        >
-          ▶ تشغيل الموسيقى
+        <button id="music-button" class="button secondary" type="button">
+          تشغيل الموسيقى
         </button>
 
-        <audio id="music" preload="none" loop></audio>
-      </header>
-
-      <!-- العبارة الختامية -->
-      <section class="closing-card card">
-        <p class="quote">
-          بحضوركم تكتمل فرحتنا، وبمشاركتكم تحلو أيامنا.
-        </p>
-      </section>
-
-      <!-- تأكيد الحضور -->
-      <section class="rsvp card">
-        <h2>تأكيد الحضور</h2>
-
-        <p class="muted">
-          نتشرّف بمشاركتكم فرحتنا.
-          يرجى تأكيد الحضور من خلال التواصل معنا.
-        </p>
-
-        <a
-          id="rsvp-link"
-          class="button-link"
-          href="#"
-          target="_blank"
-          rel="noopener noreferrer"
-          hidden
-        >
-          تأكيد الحضور عبر واتساب
+        <a id="rsvp-link" class="button secondary" href="#" target="_blank"
+           rel="noopener noreferrer" hidden>
+          تأكيد الحضور
         </a>
-      </section>
+      </div>
 
-      <footer>بكل الحب، أحمد وحنين ♡</footer>
+      <audio id="music" loop preload="none">
+        <source src="assets/music.mp3" type="audio/mpeg">
+      </audio>
+
+      <div class="ornament">✦ ❖ ✦</div>
+
+      <footer>
+        بحضوركم تكتمل فرحتنا، وبمشاركتكم تحلو أيامنا.
+      </footer>
     </section>
-
   </main>
 
-  <!-- ملفات التطبيق وSupabase -->
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script src="config.js"></script>
   <script src="app.js"></script>
