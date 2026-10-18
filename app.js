@@ -3,77 +3,83 @@
   const cfg = window.INVITE_CONFIG || {};
   const $ = (id) => document.getElementById(id);
 
-  const form = $("code-form");
   const gate = $("gate");
   const invitation = $("invitation");
-  const error = $("error");
-
-  let supabase = null;
   let countdownInterval = null;
 
-  // Check Supabase configuration
+  // Supabase client
   const configured =
     typeof cfg.supabaseUrl === "string" &&
-    typeof cfg.supabaseAnonKey === "string" &&
     cfg.supabaseUrl.startsWith("https://") &&
-    !cfg.supabaseUrl.startsWith("PASTE_") &&
+    typeof cfg.supabaseAnonKey === "string" &&
+    cfg.supabaseAnonKey.length > 0 &&
     !cfg.supabaseAnonKey.startsWith("PASTE_");
 
-  if (configured && window.supabase) {
-    supabase = window.supabase.createClient(
-      cfg.supabaseUrl,
-      cfg.supabaseAnonKey
-    );
+  const supabase =
+    configured && window.supabase
+      ? window.supabase.createClient(
+          cfg.supabaseUrl,
+          cfg.supabaseAnonKey
+        )
+      : null;
+
+  // Wedding details
+  if ($("bridegroom")) {
+    $("bridegroom").textContent = cfg.bridegroomName || "أحمد";
   }
 
-  // Invitation details
-  $("bridegroom").textContent = cfg.bridegroomName || "أحمد";
-  $("bride").textContent = cfg.brideName || "حنين";
+  if ($("bride")) {
+    $("bride").textContent = cfg.brideName || "حنين";
+  }
 
-  // Family invitation text
-  const deceasedFather = $("deceased-father");
-  const brideFather = $("bride-father");
-  const invitationOpening = $("invitation-opening");
-  const invitationRelation = $("invitation-relation");
-
-  if (deceasedFather) {
-    deceasedFather.textContent =
+  if ($("deceased-father")) {
+    $("deceased-father").textContent =
       `يتشرّف أبناء ${cfg.deceasedFatherName || "المرحوم الحاج محمد السلطان"}`;
   }
 
-  if (invitationOpening) {
-    invitationOpening.textContent =
+  if ($("invitation-opening")) {
+    $("invitation-opening").textContent =
       "بدعوتكم لحضور حفل زفاف";
   }
 
-  if (invitationRelation) {
-    invitationRelation.textContent = "أخيهم";
+  if ($("invitation-relation")) {
+    $("invitation-relation").textContent = "أخيهم";
   }
 
-  if (brideFather) {
-    brideFather.textContent =
+  if ($("bride-father")) {
+    $("bride-father").textContent =
       `السيد ${cfg.brideFatherName || "عايد الحلو"}`;
   }
 
-  $("venue-name").textContent =
-    cfg.venueName || "نقابة المهندسين الأردنيين – العقبة";
+  if ($("venue-name")) {
+    $("venue-name").textContent =
+      cfg.venueName || "نقابة المهندسين الأردنيين";
+  }
 
-  $("venue-address").textContent =
-    cfg.venueAddress || "مقابل السفارة المصرية";
+  if ($("venue-address")) {
+    $("venue-address").textContent = cfg.venueAddress || "العقبة";
+  }
 
-  $("couple-photo").src =
-    cfg.couplePhotoUrl || "assets/couple.jpg";
+  if ($("couple-video") && cfg.coupleVideoUrl) {
+    $("couple-video").src = cfg.coupleVideoUrl;
+  }
 
-  $("music").src = cfg.musicUrl || "assets/music.mp3";
+  if ($("couple-photo") && cfg.couplePhotoUrl) {
+    $("couple-photo").src = cfg.couplePhotoUrl;
+  }
+
+  if ($("music")) {
+    $("music").src = cfg.musicUrl || "assets/music.mp3";
+  }
 
   // Map link
-  if (cfg.mapUrl) {
+  if (cfg.mapUrl && $("map-link")) {
     $("map-link").href = cfg.mapUrl;
     $("map-link").hidden = false;
   }
 
-  // WhatsApp RSVP link
-  if (cfg.rsvpWhatsAppNumber) {
+  // WhatsApp RSVP
+  if (cfg.rsvpWhatsAppNumber && $("rsvp-link")) {
     const message = encodeURIComponent(
       "مرحبًا، أود تأكيد حضوري لحفل زفاف أحمد وحنين."
     );
@@ -84,89 +90,31 @@
     $("rsvp-link").hidden = false;
   }
 
-  // Invitation code verification
-  if (form) {
-    form.addEventListener("submit", async (event) => {
-      event.preventDefault();
+  // Show the invitation only when opened with a private token.
+  // This does NOT mark the invitation as used at the door.
+  const token = new URLSearchParams(
+    window.location.search
+  ).get("t");
 
-      error.textContent = "";
+  if (gate) gate.hidden = true;
 
-      const code = $("code").value.trim();
+  if (invitation) {
+    if (token && token.length >= 32) {
+      invitation.hidden = false;
+      startCountdown();
+    } else {
+      invitation.hidden = true;
 
-      if (!/^\d{6}$/.test(code)) {
-        error.textContent = "أدخل رمزًا مكوّنًا من 6 أرقام.";
-        return;
+      const message = document.createElement("p");
+      message.className = "error";
+      message.textContent =
+        "افتح رابط الدعوة الخاص الذي وصلك لعرض تفاصيل المناسبة.";
+
+      if (gate && gate.parentNode) {
+        gate.hidden = false;
+        gate.replaceChildren(message);
       }
-
-      if (!supabase) {
-        console.error("Supabase is not configured correctly.");
-
-        error.textContent =
-          "تعذّر إعداد خدمة التحقق. يرجى المحاولة لاحقًا.";
-
-        return;
-      }
-
-      const token = new URLSearchParams(
-        window.location.search
-      ).get("t");
-
-      if (!token) {
-        error.textContent =
-          "رابط الدعوة غير مكتمل. افتح الرابط الخاص الذي وصلك.";
-
-        return;
-      }
-
-      const submitButton = form.querySelector(
-        'button[type="submit"]'
-      );
-
-      if (submitButton) {
-        submitButton.disabled = true;
-      }
-
-      try {
-        const { data, error: rpcError } = await supabase.rpc(
-          "redeem_invitation",
-          {
-            p_token: token,
-            p_code: code,
-          }
-        );
-
-        if (rpcError) {
-          console.error("Supabase RPC error:", rpcError);
-
-          error.textContent =
-            "تعذّر الاتصال بخدمة التحقق. حاول مرة أخرى لاحقًا.";
-
-          return;
-        }
-
-        if (!data || data.ok !== true) {
-          error.textContent =
-            "الرمز غير صحيح أو استُخدم العدد المسموح من المرات.";
-
-          return;
-        }
-
-        // Reveal invitation after successful verification
-        gate.hidden = true;
-        invitation.hidden = false;
-
-        startCountdown();
-      } catch (exception) {
-        console.error("Unexpected verification error:", exception);
-
-        error.textContent =
-          "حدث خطأ غير متوقع. يرجى المحاولة مرة أخرى.";
-      } finally {
-        if (submitButton) {
-          submitButton.disabled = false;
-        }
-      }
-    });
+    }
   }
 
   // Music playback
@@ -175,7 +123,6 @@
   if (musicButton) {
     musicButton.addEventListener("click", async () => {
       const audio = $("music");
-
       if (!audio) return;
 
       if (audio.paused) {
@@ -184,9 +131,7 @@
           musicButton.textContent = "❚❚ إيقاف الموسيقى";
         } catch (exception) {
           console.error("Audio playback error:", exception);
-
-          musicButton.textContent =
-            "تعذّر التشغيل؛ جرّب مرة أخرى";
+          musicButton.textContent = "تعذّر التشغيل؛ جرّب مرة أخرى";
         }
       } else {
         audio.pause();
@@ -195,14 +140,10 @@
     });
   }
 
-  // Wedding countdown
+  // Countdown
   function startCountdown() {
     const countdown = $("countdown");
-
-    if (!countdown) {
-      console.error("Countdown element was not found.");
-      return;
-    }
+    if (!countdown) return;
 
     const target = new Date(
       cfg.weddingDateISO || "2026-11-27T19:00:00+03:00"
@@ -220,16 +161,11 @@
     const render = () => {
       const difference = Math.max(0, target - Date.now());
 
-      const days = Math.floor(difference / 86400000);
-      const hours = Math.floor(difference / 3600000) % 24;
-      const minutes = Math.floor(difference / 60000) % 60;
-      const seconds = Math.floor(difference / 1000) % 60;
-
       const units = [
-        ["يوم", days],
-        ["ساعة", hours],
-        ["دقيقة", minutes],
-        ["ثانية", seconds],
+        ["يوم", Math.floor(difference / 86400000)],
+        ["ساعة", Math.floor(difference / 3600000) % 24],
+        ["دقيقة", Math.floor(difference / 60000) % 60],
+        ["ثانية", Math.floor(difference / 1000) % 60],
       ];
 
       countdown.replaceChildren();
