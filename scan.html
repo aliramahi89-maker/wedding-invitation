@@ -1,1 +1,207 @@
+```html
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#f8f2e8">
+  <title>التحقق من دعوات الزفاف</title>
 
+  <style>
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      padding: 20px 14px;
+      min-height: 100vh;
+      background: #f8f2e8;
+      color: #382f28;
+      font-family: Arial, sans-serif;
+      text-align: center;
+    }
+
+    main {
+      width: 100%;
+      max-width: 480px;
+      margin: 20px auto;
+      padding: 24px 18px;
+      background: #fffdf9;
+      border: 1px solid #dfcfb0;
+      border-radius: 18px;
+      box-shadow: 0 8px 30px #5c482015;
+    }
+
+    h1 { color: #aa8954; font-size: 26px; }
+    p { line-height: 1.8; }
+
+    #reader {
+      width: 100%;
+      margin: 20px auto;
+      overflow: hidden;
+      border-radius: 12px;
+    }
+
+    button {
+      width: 100%;
+      padding: 14px;
+      margin: 7px 0;
+      border: 0;
+      border-radius: 10px;
+      background: #aa8954;
+      color: white;
+      font-size: 16px;
+      cursor: pointer;
+    }
+
+    button:disabled {
+      opacity: 0.55;
+      cursor: not-allowed;
+    }
+
+    #result {
+      display: none;
+      margin-top: 18px;
+      padding: 16px;
+      border-radius: 10px;
+      font-size: 18px;
+      font-weight: bold;
+      overflow-wrap: anywhere;
+    }
+
+    .info {
+      background: #f4ead7;
+      color: #6c532b;
+    }
+
+    .success {
+      background: #e0f4e5;
+      color: #176534;
+    }
+
+    .error {
+      background: #fbe4e4;
+      color: #a51d1d;
+    }
+
+    .note {
+      font-size: 13px;
+      color: #75685c;
+    }
+  </style>
+</head>
+
+<body>
+  <main>
+    <h1>التحقق من الدعوات</h1>
+    <p>أحمد وحنين — 27 نوفمبر 2026</p>
+
+    <div id="reader"></div>
+
+    <button id="start-button" type="button">
+      تشغيل الكاميرا ومسح QR
+    </button>
+
+    <button id="stop-button" type="button" disabled>
+      إيقاف الكاميرا
+    </button>
+
+    <div id="result" role="status" aria-live="polite"></div>
+
+    <p class="note">
+      يجب أن تكون صفحة المسح متاحة عبر HTTPS للسماح باستخدام الكاميرا.
+    </p>
+  </main>
+
+  <script src="https://unpkg.com/html5-qrcode@2.3.8/html5-qrcode.min.js"></script>
+
+  <script>
+    (() => {
+      const readerElement = document.getElementById("reader");
+      const startButton = document.getElementById("start-button");
+      const stopButton = document.getElementById("stop-button");
+      const result = document.getElementById("result");
+
+      let scanner = null;
+      let starting = false;
+      let processing = false;
+
+      function showResult(message, type) {
+        result.textContent = message;
+        result.className = type;
+        result.style.display = "block";
+      }
+
+      async function stopScanner() {
+        if (!scanner || !scanner.isScanning) {
+          stopButton.disabled = true;
+          return;
+        }
+
+        try {
+          await scanner.stop();
+        } catch (error) {
+          console.error("Scanner stop error:", error);
+        }
+
+        stopButton.disabled = true;
+        startButton.disabled = false;
+      }
+
+      async function handleScan(decodedText) {
+        if (processing) return;
+        processing = true;
+
+        await stopScanner();
+
+        // لا نعتبر الدعوة مقبولة بمجرد قراءة QR.
+        // يجب التحقق من الرمز على الخادم قبل السماح بالدخول.
+        showResult(
+          "تمت قراءة QR، لكن التحقق من صلاحية الدعوة غير مفعّل بعد. لا تسمح بالدخول بناءً على هذه الرسالة.",
+          "info"
+        );
+
+        console.log("QR scanned. Server verification is not configured.");
+        processing = false;
+      }
+
+      startButton.addEventListener("click", async () => {
+        if (starting) return;
+
+        starting = true;
+        startButton.disabled = true;
+        showResult("جارٍ تشغيل الكاميرا...", "info");
+
+        try {
+          if (!window.Html5Qrcode) {
+            throw new Error("تعذّر تحميل مكتبة مسح QR.");
+          }
+
+          scanner = new Html5Qrcode("reader");
+
+          await scanner.start(
+            { facingMode: "environment" },
+            { fps: 10, qrbox: { width: 230, height: 230 } },
+            handleScan,
+            () => {}
+          );
+
+          stopButton.disabled = false;
+          showResult("وجّه الكاميرا نحو QR الدعوة.", "info");
+        } catch (error) {
+          console.error(error);
+          showResult(
+            "تعذّر تشغيل الكاميرا. تأكد من السماح باستخدامها وفتح الصفحة عبر HTTPS.",
+            "error"
+          );
+          startButton.disabled = false;
+        } finally {
+          starting = false;
+        }
+      });
+
+      stopButton.addEventListener("click", stopScanner);
+    })();
+  </script>
+</body>
+</html>
+```
