@@ -2,8 +2,8 @@
 window.INVITE_CONFIG = {
   // Supabase project settings
   // Replace these placeholders with your actual public project values.
-  supabaseUrl: "https://YOUR_PROJECT_ID.supabase.co",
-  supabaseAnonKey: "YOUR_SUPABASE_PUBLISHABLE_OR_ANON_KEY",
+  supabaseUrl: "https://xkjmygkkbrjzqfgkajgc.supabase.co/rest/v1/",
+  supabaseAnonKey: "sb_publishable_DzZKK4laLnuakAnye-fPRw_Vdqd2_dp",
 
   // Wedding details
   bridegroomName: "أحمد",
