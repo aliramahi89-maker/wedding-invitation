@@ -1,7 +1,7 @@
 window.INVITE_CONFIG = {
   // Supabase — ضع القيم الحقيقية الموجودة في ملفك الحالي
-  supabaseUrl: "PASTE_YOUR_SUPABASE_URL_HERE",
-  supabaseAnonKey: "PASTE_YOUR_SUPABASE_ANON_KEY_HERE",
+  supabaseUrl: "supabaseUrl: "https://xkjmygkkbrjzqfgkajgc.supabase.co",",
+  supabaseAnonKey: "sb_publishable_DzZKK4laLnuakAnye-fPRw_Vdqd2_dp",
 
   // Wedding details
   weddingDateISO: "2026-11-27T19:00:00+03:00",
