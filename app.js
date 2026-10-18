@@ -30,6 +30,31 @@
   $("bridegroom").textContent = cfg.bridegroomName || "أحمد";
   $("bride").textContent = cfg.brideName || "حنين";
 
+  // Family invitation text
+  const deceasedFather = $("deceased-father");
+  const brideFather = $("bride-father");
+  const invitationOpening = $("invitation-opening");
+  const invitationRelation = $("invitation-relation");
+
+  if (deceasedFather) {
+    deceasedFather.textContent =
+      `يتشرّف أبناء ${cfg.deceasedFatherName || "المرحوم الحاج محمد السلطان"}`;
+  }
+
+  if (invitationOpening) {
+    invitationOpening.textContent =
+      "بدعوتكم لحضور حفل زفاف";
+  }
+
+  if (invitationRelation) {
+    invitationRelation.textContent = "أخيهم";
+  }
+
+  if (brideFather) {
+    brideFather.textContent =
+      `السيد ${cfg.brideFatherName || "عايد الحلو"}`;
+  }
+
   $("venue-name").textContent =
     cfg.venueName || "نقابة المهندسين الأردنيين – العقبة";
 
@@ -60,109 +85,115 @@
   }
 
   // Invitation code verification
-  form.addEventListener("submit", async (event) => {
-    event.preventDefault();
+  if (form) {
+    form.addEventListener("submit", async (event) => {
+      event.preventDefault();
 
-    error.textContent = "";
+      error.textContent = "";
 
-    const code = $("code").value.trim();
+      const code = $("code").value.trim();
 
-    if (!/^\d{6}$/.test(code)) {
-      error.textContent = "أدخل رمزًا مكوّنًا من 6 أرقام.";
-      return;
-    }
+      if (!/^\d{6}$/.test(code)) {
+        error.textContent = "أدخل رمزًا مكوّنًا من 6 أرقام.";
+        return;
+      }
 
-    if (!supabase) {
-      console.error("Supabase is not configured correctly.");
+      if (!supabase) {
+        console.error("Supabase is not configured correctly.");
 
-      error.textContent =
-        "تعذّر إعداد خدمة التحقق. يرجى المحاولة لاحقًا.";
+        error.textContent =
+          "تعذّر إعداد خدمة التحقق. يرجى المحاولة لاحقًا.";
 
-      return;
-    }
+        return;
+      }
 
-    const token = new URLSearchParams(
-      window.location.search
-    ).get("t");
+      const token = new URLSearchParams(
+        window.location.search
+      ).get("t");
 
-    if (!token) {
-      error.textContent =
-        "رابط الدعوة غير مكتمل. افتح الرابط الخاص الذي وصلك.";
+      if (!token) {
+        error.textContent =
+          "رابط الدعوة غير مكتمل. افتح الرابط الخاص الذي وصلك.";
 
-      return;
-    }
+        return;
+      }
 
-    const submitButton = form.querySelector(
-      'button[type="submit"]'
-    );
-
-    if (submitButton) {
-      submitButton.disabled = true;
-    }
-
-    try {
-      const { data, error: rpcError } = await supabase.rpc(
-        "redeem_invitation",
-        {
-          p_token: token,
-          p_code: code,
-        }
+      const submitButton = form.querySelector(
+        'button[type="submit"]'
       );
 
-      if (rpcError) {
-        // Diagnostic details are kept in the browser console.
-        console.error("Supabase RPC error:", rpcError);
-
-        error.textContent =
-          "تعذّر الاتصال بخدمة التحقق. حاول مرة أخرى لاحقًا.";
-
-        return;
-      }
-
-      if (!data || data.ok !== true) {
-        error.textContent =
-          "الرمز غير صحيح أو استُخدم العدد المسموح من المرات.";
-
-        return;
-      }
-
-      // Reveal the invitation only after successful verification.
-      gate.hidden = true;
-      invitation.hidden = false;
-
-      startCountdown();
-    } catch (exception) {
-      console.error("Unexpected verification error:", exception);
-
-      error.textContent =
-        "حدث خطأ غير متوقع. يرجى المحاولة مرة أخرى.";
-    } finally {
       if (submitButton) {
-        submitButton.disabled = false;
+        submitButton.disabled = true;
       }
-    }
-  });
+
+      try {
+        const { data, error: rpcError } = await supabase.rpc(
+          "redeem_invitation",
+          {
+            p_token: token,
+            p_code: code,
+          }
+        );
+
+        if (rpcError) {
+          console.error("Supabase RPC error:", rpcError);
+
+          error.textContent =
+            "تعذّر الاتصال بخدمة التحقق. حاول مرة أخرى لاحقًا.";
+
+          return;
+        }
+
+        if (!data || data.ok !== true) {
+          error.textContent =
+            "الرمز غير صحيح أو استُخدم العدد المسموح من المرات.";
+
+          return;
+        }
+
+        // Reveal invitation after successful verification
+        gate.hidden = true;
+        invitation.hidden = false;
+
+        startCountdown();
+      } catch (exception) {
+        console.error("Unexpected verification error:", exception);
+
+        error.textContent =
+          "حدث خطأ غير متوقع. يرجى المحاولة مرة أخرى.";
+      } finally {
+        if (submitButton) {
+          submitButton.disabled = false;
+        }
+      }
+    });
+  }
 
   // Music playback
-  $("music-button").addEventListener("click", async () => {
-    const audio = $("music");
-    const button = $("music-button");
+  const musicButton = $("music-button");
 
-    if (audio.paused) {
-      try {
-        await audio.play();
-        button.textContent = "❚❚ إيقاف الموسيقى";
-      } catch (exception) {
-        console.error("Audio playback error:", exception);
+  if (musicButton) {
+    musicButton.addEventListener("click", async () => {
+      const audio = $("music");
 
-        button.textContent =
-          "تعذّر التشغيل؛ جرّب مرة أخرى";
+      if (!audio) return;
+
+      if (audio.paused) {
+        try {
+          await audio.play();
+          musicButton.textContent = "❚❚ إيقاف الموسيقى";
+        } catch (exception) {
+          console.error("Audio playback error:", exception);
+
+          musicButton.textContent =
+            "تعذّر التشغيل؛ جرّب مرة أخرى";
+        }
+      } else {
+        audio.pause();
+        musicButton.textContent = "▶ تشغيل الموسيقى";
       }
-    } else {
-      audio.pause();
-      button.textContent = "▶ تشغيل الموسيقى";
-    }
-  });
+    });
+  }
 
   // Wedding countdown
   function startCountdown() {
@@ -174,7 +205,7 @@
     }
 
     const target = new Date(
-      cfg.weddingDateISO || "2026-11-27T20:00:00+03:00"
+      cfg.weddingDateISO || "2026-11-27T19:00:00+03:00"
     ).getTime();
 
     if (Number.isNaN(target)) {
